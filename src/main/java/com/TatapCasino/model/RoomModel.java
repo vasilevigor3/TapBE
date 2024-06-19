@@ -15,9 +15,18 @@ public class RoomModel {
     @Column(name = "id", nullable = false)
     private Long id;
     private String roomName;
-    @OneToMany
-    private List<PlayerModel> players;
     private int maxPlayers;
     private double bet;
 
+    @ManyToOne
+    @JoinColumn(name = "owner_id")
+    private PlayerModel owner;
+
+    @ManyToMany
+    @JoinTable(
+            name = "room_players",
+            joinColumns = @JoinColumn(name = "room_id"),
+            inverseJoinColumns = @JoinColumn(name = "player_id")
+    )
+    private List<PlayerModel> players;
 }

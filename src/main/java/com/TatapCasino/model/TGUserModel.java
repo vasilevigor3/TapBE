@@ -12,4 +12,7 @@ public class TGUserModel {
     @Column(name = "id", nullable = false)
     private Long id;
     private String name;
+    @OneToOne
+    private PlayerModel player;
+    //TODO USER-PLAYER CONVERSION
 }

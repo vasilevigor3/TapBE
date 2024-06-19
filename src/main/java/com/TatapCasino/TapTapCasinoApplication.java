@@ -33,8 +33,10 @@ public class TapTapCasinoApplication implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 
 		PlayerModel testPlayer = new PlayerModel();
+		testPlayer.setId(1L);
 		testPlayer.setName("TestUser");
 		PlayerModel testPlayer2 = new PlayerModel();
+		testPlayer2.setId(2L);
 		testPlayer2.setName("TestUser2");
 		playerService.saveAllPlayers(List.of(testPlayer,testPlayer2));
 
