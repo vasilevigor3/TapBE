@@ -25,11 +25,13 @@ public class RoomService {
     private PlayerService playerService;
 
 
-    public List<RoomModel> getAllRooms() {
-        return roomRepository.findAll();
+    public List<RoomDTO> getAllRooms() {
+        final List<RoomModel> rooms = roomRepository.findAll();
+        final List<RoomDTO> roomDTOS = rooms.stream().map(roomModel -> roomConverter.convertToDTO(roomModel)).toList();
+        return roomDTOS;
     }
 
-    public ResponseEntity<RoomDTO> getRoomById(long id){
+    public ResponseEntity<RoomDTO> getRoomById(long id) {
         Optional<RoomModel> roomModelOptional = roomRepository.findById(id);
         return roomModelOptional.map(roomModel -> ResponseEntity.ok(roomConverter.convertToDTO(roomModel)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
@@ -48,20 +50,30 @@ public class RoomService {
 
     public RoomDTO createRoom(final RoomDTO roomDTO) {
         final Optional<RoomModel> existingRoom = roomRepository.findById(roomDTO.getId());
-        playerService.getPlayerById(roomDTO.getOwnerId());
+        final Optional<PlayerModel> player = playerService.getPlayerById(roomDTO.getOwnerId());
 
         if (existingRoom.isPresent()) {
             throw new RuntimeException("Room with ID " + roomDTO.getId() + " already exists");
         }
 
-        final RoomModel roomModel = roomConverter.convertToModel(roomDTO);
-        saveRoom(roomModel);
-        return roomConverter.convertToDTO(roomModel);
+        if (player.isPresent()) {
+            final RoomModel currentRoom = player.get().getCurrentRoom();
+            final RoomModel ownedRoom = player.get().getOwnedRoom();
+
+            if (currentRoom == null && ownedRoom == null) {
+                final RoomModel roomModel = roomConverter.convertToModel(roomDTO);
+                saveRoom(roomModel);
+                return roomConverter.convertToDTO(roomModel);
+            } else {
+                throw new RuntimeException("Player with ID " + roomDTO.getOwnerId() + " is already in a room");
+            }
+        } else {
+            throw new RuntimeException("Player with ID " + roomDTO.getOwnerId() + " not found");
+        }
     }
 
     @Transactional
-    public
-    ResponseEntity<RoomDTO> joinPlayerToRoom(final RoomDTO roomDTO) {
+    public ResponseEntity<RoomDTO> joinPlayerToRoom(final RoomDTO roomDTO) {
         final Optional<RoomModel> roomModelOptional = roomRepository.findById(roomDTO.getId());
         final RoomModel roomModel = roomModelOptional.orElseThrow(() -> new RuntimeException("Room not found"));
         roomModel.getPlayers().addAll(playerService.getPlayersByIds(roomDTO.getPlayerIds()));

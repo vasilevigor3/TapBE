@@ -10,7 +10,6 @@ import jakarta.validation.constraints.NotNull;
 @Entity
 @Getter
 @Setter
-//todo CHECK RELATIONS WITH ROOMS
 public class PlayerModel {
     @Id
     @Column(name = "id", nullable = false)
