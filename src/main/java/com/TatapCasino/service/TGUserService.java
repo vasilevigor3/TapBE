@@ -1,5 +1,8 @@
 package com.TatapCasino.service;
 
+import com.TatapCasino.converter.TGUserConverter;
+import com.TatapCasino.dto.TGUserDTO;
+import com.TatapCasino.model.PlayerModel;
 import com.TatapCasino.model.TGUserModel;
 import com.TatapCasino.repository.TGUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +20,18 @@ public class TGUserService {
     @Autowired
     private TGUserRepository TGUserRepository;
 
+    @Autowired
+    private TGUserConverter tgUserConverter;
+
     @Value("${telegram.user.check.enabled}")
     private boolean isTelegramUserCheckEnabled;
 
     private static final String TELEGRAM_API_URL = "https://api.telegram.org/bot7237751589:AAFxs_T73zvEkmiPgA7xbAczOwCMJNQfyOM/getChat?chat_id=";
 
-    public List<TGUserModel> getAllTGUsers() {
-        return TGUserRepository.findAll();
+    public List<TGUserDTO> getAllTGUsers() {
+        final List<TGUserModel> tgUsersAll = TGUserRepository.findAll();
+        final List<TGUserDTO> tgUserDTOS = tgUsersAll.stream().map(tgUserModel -> tgUserConverter.convertToDTO(tgUserModel)).toList();
+        return tgUserDTOS;
     }
 
     @Transactional
@@ -44,15 +52,17 @@ public class TGUserService {
     }
 
     @Transactional
-    public TGUserModel getOrCreateTGUser(final Long id, final String userName) {
+    public TGUserDTO getOrCreateTGUser(final Long id, final String userName) {
+        final TGUserModel tgUserModel = getTGUserById(id).orElseGet(() -> saveTGUser(id, userName));
         if (isTelegramUserCheckEnabled) {
             if (isUserExistsInTelegram(id)) {
-                return getTGUserById(id).orElseGet(() -> saveTGUser(id, userName));
+
+                return tgUserConverter.convertToDTO(tgUserModel);
             } else {
                 throw new RuntimeException("User does not exist in Telegram.");
             }
         } else {
-            return getTGUserById(id).orElseGet(() -> saveTGUser(id, userName));
+            return tgUserConverter.convertToDTO(tgUserModel);
         }
     }
 

@@ -1,10 +1,11 @@
 package com.TatapCasino.model;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import jakarta.validation.constraints.NotNull;
 
-import java.util.List;
 
 @Entity
 @Getter
@@ -14,15 +15,22 @@ public class PlayerModel {
     @Id
     @Column(name = "id", nullable = false)
     private Long id;
+
+    @NotNull
     private String name;
+
     private double balance;
 
     @OneToOne
+    @JoinColumn(name = "tgUserAccount_id")
     private TGUserModel tgUserAccount;
 
-    @OneToMany(mappedBy = "owner")
-    private List<RoomModel> ownedRooms;
+    @Nullable
+    @OneToOne(mappedBy = "owner")
+    private RoomModel ownedRoom;
 
-    @ManyToMany(mappedBy = "players")
-    private List<RoomModel> rooms;
+    @Nullable
+    @ManyToOne
+    @JoinColumn(name = "current_room_id")
+    private RoomModel currentRoom;
 }

@@ -1,8 +1,12 @@
 package com.TatapCasino.controllers;
 
+import com.TatapCasino.dto.RoomDTO;
 import com.TatapCasino.model.RoomModel;
+import com.TatapCasino.service.GameService;
 import com.TatapCasino.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,19 +16,28 @@ import java.util.List;
 public class RoomController {
     @Autowired
     private RoomService roomService;
+    @Autowired
+    private GameService gameService;
 
-    @GetMapping("/rooms")
+
+    @GetMapping("/getAllRooms")
     public List<RoomModel> getAllRooms(){
         return roomService.getAllRooms();
     }
 
-    @PostMapping("/create-room")
-    public RoomModel createRoom(@RequestBody RoomModel roomData) {
-        RoomModel room = new RoomModel();
-        room.setRoomName(roomData.getRoomName());
-        room.setMaxPlayers(roomData.getMaxPlayers());
-        room.setBet(roomData.getBet());
+    @GetMapping("/room/{id}")
+    public ResponseEntity<RoomDTO> getRoomById(@PathVariable Long id) {
+        return roomService.getRoomById(id);
+    }
 
-        return roomService.saveRoom(room);
+
+    @PostMapping("/create-room")
+    public RoomDTO createRoom(@Validated @RequestBody RoomDTO roomDTO) {
+        return roomService.createRoom(roomDTO);
+    }
+
+    @PostMapping("/join-room")
+    public ResponseEntity<RoomDTO> joinRoom(/*@Validated*/ @RequestBody RoomDTO roomDTO) {
+        return roomService.joinPlayerToRoom(roomDTO);
     }
 }

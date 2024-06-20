@@ -1,6 +1,8 @@
 package com.TatapCasino.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,19 +16,23 @@ public class RoomModel {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
+    @NotNull
     private String roomName;
+    @NotNull
     private int maxPlayers;
+    @NotNull
     private double bet;
 
-    @ManyToOne
+    @NotNull
+    @OneToOne
+    private GameModel gameModel;
+
+    @NotNull
+    @OneToOne
     @JoinColumn(name = "owner_id")
     private PlayerModel owner;
 
-    @ManyToMany
-    @JoinTable(
-            name = "room_players",
-            joinColumns = @JoinColumn(name = "room_id"),
-            inverseJoinColumns = @JoinColumn(name = "player_id")
-    )
+    @NotNull
+    @OneToMany(mappedBy = "currentRoom")
     private List<PlayerModel> players;
 }

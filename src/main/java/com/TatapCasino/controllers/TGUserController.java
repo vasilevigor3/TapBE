@@ -1,6 +1,6 @@
 package com.TatapCasino.controllers;
 
-import com.TatapCasino.model.TGUserModel;
+import com.TatapCasino.dto.TGUserDTO;
 import com.TatapCasino.service.TGUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -15,13 +15,13 @@ public class TGUserController {
     @Autowired
     private TGUserService TGUserService;
 
-    @GetMapping("/TGUsers")
-    public List<TGUserModel> getAllTGUsers() {
+    @GetMapping("/getAllTGUsers")
+    public List<TGUserDTO> getAllTGUsers() {
         return TGUserService.getAllTGUsers();
     }
 
     @PostMapping("/getOrCreateTGUser")
-    public TGUserModel getOrCreateTGUser(@RequestBody final Map<String, String> requestData) {
+    public TGUserDTO getOrCreateTGUser(@RequestBody final Map<String, String> requestData) {
         final long id = Long.parseLong(requestData.get("id"));
         final String userName = requestData.get("name");
 

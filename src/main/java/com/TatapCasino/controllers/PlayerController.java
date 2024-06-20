@@ -1,13 +1,17 @@
 package com.TatapCasino.controllers;
 
+import com.TatapCasino.dto.PlayerDTO;
+import com.TatapCasino.dto.RoomDTO;
+import com.TatapCasino.exceptions.TGUserNotFoundException;
 import com.TatapCasino.model.PlayerModel;
 import com.TatapCasino.service.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -17,10 +21,24 @@ public class PlayerController {
     private PlayerService playerService;
 
     @GetMapping("/players")
-    public List<PlayerModel> getAllPlayers() {
+    public List<PlayerDTO> getAllPlayers() {
+        return playerService.getAllPlayersDTO();
+    }
+    @GetMapping("/players2")
+    public List<PlayerModel> getAllPlayers2() {
         return playerService.getAllPlayers();
     }
-//
-//    @PostMapping
-//    public
+
+    @PostMapping("/getOrCreatePlayer")
+    public ResponseEntity<?> getOrCreatePlayer(@RequestBody final Map<String, String> requestData) {
+        final long id = Long.parseLong(requestData.get("id"));
+        try {
+            final PlayerDTO playerDTO = playerService.getOrCreatePlayerDTO(id);
+            return ResponseEntity.ok(playerDTO);
+        } catch (Exception ex) {
+            throw ex;
+        }
+
+    }
+
 }
