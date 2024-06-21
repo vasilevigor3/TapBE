@@ -1,7 +1,9 @@
 package com.TatapCasino.service;
 
+import com.TatapCasino.controllers.ScoreRequest;
+import com.TatapCasino.converter.PlayerConverter;
 import com.TatapCasino.converter.RoomConverter;
-import com.TatapCasino.dto.ResultDTO;
+import com.TatapCasino.dto.PlayerDTO;
 import com.TatapCasino.dto.RoomDTO;
 import com.TatapCasino.model.GameModel;
 import com.TatapCasino.model.PlayerModel;
@@ -13,7 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -25,6 +29,13 @@ public class RoomService {
     @Autowired
     private PlayerService playerService;
 
+    @Autowired
+    private ScoreService scoreService;
+    @Autowired
+    private PlayerConverter playerConverter;
+    @Autowired
+    private GameService gameService;
+
 
     public List<RoomDTO> getAllRooms() {
         final List<RoomModel> rooms = roomRepository.findAll();
@@ -33,7 +44,7 @@ public class RoomService {
     }
 
     public ResponseEntity<RoomDTO> getRoomDTOById(long id) {
-        Optional<RoomModel> roomModelOptional = roomRepository.findById(id);
+        final Optional<RoomModel> roomModelOptional = roomRepository.findById(id);
         return roomModelOptional.map(roomModel -> ResponseEntity.ok(roomConverter.convertToDTO(roomModel)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -53,7 +64,7 @@ public class RoomService {
         return savedRoom;
     }
 
-    public void deleteRoom(RoomModel roomModel){
+    public void deleteRoom(RoomModel roomModel) {
         roomRepository.delete(roomModel);
     }
 
@@ -67,10 +78,6 @@ public class RoomService {
 
     public RoomDTO createRoom(final RoomDTO roomDTO) {
 
-        //TODO
-        // - add to RoomDTO winnerID +++
-        // - create ScoreModel obj to owner +++
-        // - add wonGames to PlayerDTO +++
         final Optional<RoomModel> existingRoom = roomRepository.findById(roomDTO.getId());
         final Optional<PlayerModel> player = playerService.getPlayerById(roomDTO.getOwnerId());
 
@@ -95,8 +102,7 @@ public class RoomService {
 
     @Transactional
     public ResponseEntity<RoomDTO> joinPlayerToRoom(final RoomDTO roomDTO) {
-        //TODO
-        // - create ScoreModel obj to player who was joined +++
+
         final Optional<RoomModel> room = roomRepository.findById(roomDTO.getId());
         final RoomModel roomModel = room.orElseThrow(() -> new RuntimeException("Room not found"));
 
@@ -138,7 +144,7 @@ public class RoomService {
             final PlayerModel playerModel = player.get();
 
             if (roomModel.getOwner().equals(playerModel)) {
-                // If the player owns the room, remove references and delete the room
+
                 roomModel.getPlayers().forEach(p -> {
                     p.setCurrentRoom(null);
                     playerService.savePlayer(p);
@@ -147,11 +153,11 @@ public class RoomService {
                 playerService.savePlayer(playerModel);
                 roomRepository.delete(roomModel);
             } else if (roomModel.getPlayers().contains(playerModel)) {
-                // If the player is in the room, remove the player from the room
+
                 roomModel.getPlayers().remove(playerModel);
-                playerModel.setCurrentRoom(null); // Remove the player's current room
+                playerModel.setCurrentRoom(null);
                 saveRoom(roomModel);
-                playerService.savePlayer(playerModel); // Save the player to update their room status
+                playerService.savePlayer(playerModel);
             } else {
                 throw new RuntimeException("Player with ID " + playerId + " is not in the room");
             }
@@ -175,16 +181,73 @@ public class RoomService {
         }
     }
 
-//    //TODO run startGame when joined last player 10/10
-//    public ResponseEntity<RoomDTO> startGame(RoomDTO roomDTO) {
-//        final Optional<RoomModel> room = roomRepository.findById(roomDTO.getId());
-//        final RoomModel roomModel = room.orElseThrow(() -> new RuntimeException("Room not found"));
-//        //TODO if room.maxPlayers==playerIds.size() -> roomModel.setIsGameStarted(true);
-//        return ResponseEntity.ok(roomConverter.convertToDTO(roomModel));
-//    }
+    @Transactional
+    public PlayerDTO finishGame(ScoreRequest scoreRequest) {
+        final RoomModel roomModel = getRoomModel(scoreRequest.getRoomId());
+        if (roomModel.getIsGameStarted()) {
+            final Long gameModelId = roomModel.getGameModel().getId();
+            final Map<PlayerModel, Long> playersCurrentRoomWithScores = updateScores(scoreRequest, gameModelId);
+            final PlayerModel playerWithMaxScore = getPlayerWithMaxScore(playersCurrentRoomWithScores);
+            processWinner(roomModel, gameModelId, playerWithMaxScore);
+            return playerConverter.convertToDTO(playerWithMaxScore);
+        } else {
+            throw new RuntimeException("Game in room with id: " + roomModel.getId() + "wasn't started yet");
+        }
+    }
 
-    public ResponseEntity<ResultDTO> finishGame(RoomDTO roomDTO) {
-        final ResultDTO resultDTO = new ResultDTO();
-        return ResponseEntity.ok(resultDTO);
+    private RoomModel getRoomModel(String roomId) {
+        return getRoomById(Long.parseLong(roomId))
+                .orElseThrow(() -> new RuntimeException("Room with id: " + roomId + " doesn't exist"));
+    }
+
+    private Map<PlayerModel, Long> updateScores(ScoreRequest scoreRequest, Long gameModelId) {
+        final Map<PlayerModel, Long> playersCurrentRoomWithScores = new HashMap<>();
+        for (Map<String, String> playerScore : scoreRequest.getPlayersScores()) {
+            for (Map.Entry<String, String> entry : playerScore.entrySet()) {
+                PlayerModel playerModel = getPlayerModel(entry.getKey());
+                updatePlayerScore(playerModel, gameModelId, Integer.parseInt(entry.getValue()));
+                playersCurrentRoomWithScores.put(playerModel, Long.parseLong(entry.getValue()));
+                playerService.savePlayer(playerModel);
+            }
+        }
+        return playersCurrentRoomWithScores;
+    }
+
+    private PlayerModel getPlayerModel(String playerIdStr) {
+        final long playerId = Long.parseLong(playerIdStr);
+        return playerService.getPlayerById(playerId)
+                .orElseThrow(() -> new RuntimeException("Player with id: " + playerId + " doesn't exist"));
+    }
+
+    private void updatePlayerScore(PlayerModel playerModel, Long gameModelId, int score) {
+        playerModel.getScores().stream()
+                .filter(scoreModel -> scoreModel.getGameId().equals(gameModelId))
+                .findFirst()
+                .ifPresent(scoreModel -> {
+                    scoreModel.setScore(score);
+                    scoreService.saveScore(scoreModel);
+                });
+    }
+
+    private PlayerModel getPlayerWithMaxScore(Map<PlayerModel, Long> playersCurrentRoomWithScores) {
+        return playersCurrentRoomWithScores.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .orElseThrow(() -> new RuntimeException("No winner found"))
+                .getKey();
+    }
+
+    private void processWinner(RoomModel roomModel, Long gameModelId, PlayerModel playerWithMaxScore) {
+        final GameModel gameModel = gameService.findGameById(gameModelId)
+                .orElseThrow(() -> new RuntimeException("Game with id: " + gameModelId + " doesn't exist"));
+        playerWithMaxScore.getWonGames().add(gameModel);
+        gameModel.setWinner(playerWithMaxScore);
+        gameModel.setRoom(null);
+        playerService.savePlayer(playerWithMaxScore);
+        gameService.saveGame(gameModel);
+        roomModel.getPlayers().forEach(player -> {
+            player.setCurrentRoom(null);
+            playerService.savePlayer(player);
+        });
+        deleteRoom(roomModel);
     }
 }

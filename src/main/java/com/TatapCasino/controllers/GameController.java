@@ -1,6 +1,5 @@
 package com.TatapCasino.controllers;
 
-import com.TatapCasino.dto.PlayerDTO;
 import com.TatapCasino.model.GameModel;
 import com.TatapCasino.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;

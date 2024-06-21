@@ -2,7 +2,6 @@ package com.TatapCasino.converter;
 
 import com.TatapCasino.dto.TGUserDTO;
 import com.TatapCasino.model.TGUserModel;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 @Service

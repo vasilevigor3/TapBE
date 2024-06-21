@@ -1,12 +1,8 @@
 package com.TatapCasino.controllers;
 
 import com.TatapCasino.dto.PlayerDTO;
-import com.TatapCasino.dto.RoomDTO;
-import com.TatapCasino.exceptions.TGUserNotFoundException;
-import com.TatapCasino.model.PlayerModel;
 import com.TatapCasino.service.PlayerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

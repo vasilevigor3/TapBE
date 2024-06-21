@@ -2,7 +2,6 @@ package com.TatapCasino.service;
 
 import com.TatapCasino.converter.TGUserConverter;
 import com.TatapCasino.dto.TGUserDTO;
-import com.TatapCasino.model.PlayerModel;
 import com.TatapCasino.model.TGUserModel;
 import com.TatapCasino.repository.TGUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

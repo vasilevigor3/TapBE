@@ -1,8 +1,6 @@
 package com.TatapCasino;
 
 import com.TatapCasino.dto.RoomDTO;
-import com.TatapCasino.enums.GameType;
-import com.TatapCasino.model.GameModel;
 import com.TatapCasino.model.PlayerModel;
 import com.TatapCasino.model.TGUserModel;
 import com.TatapCasino.repository.PlayerRepository;

@@ -1,11 +1,8 @@
 package com.TatapCasino.dto;
 
-import com.TatapCasino.model.RoomModel;
-import com.TatapCasino.model.TGUserModel;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.lang.Nullable;
 
 import java.util.List;
 
