@@ -24,10 +24,6 @@ public class PlayerController {
     public List<PlayerDTO> getAllPlayers() {
         return playerService.getAllPlayersDTO();
     }
-    @GetMapping("/players2")
-    public List<PlayerModel> getAllPlayers2() {
-        return playerService.getAllPlayers();
-    }
 
     @PostMapping("/getOrCreatePlayer")
     public ResponseEntity<?> getOrCreatePlayer(@RequestBody final Map<String, String> requestData) {
@@ -38,7 +34,5 @@ public class PlayerController {
         } catch (Exception ex) {
             throw ex;
         }
-
     }
-
 }

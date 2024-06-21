@@ -32,10 +32,14 @@ public class RoomService {
         return roomDTOS;
     }
 
-    public ResponseEntity<RoomDTO> getRoomById(long id) {
+    public ResponseEntity<RoomDTO> getRoomDTOById(long id) {
         Optional<RoomModel> roomModelOptional = roomRepository.findById(id);
         return roomModelOptional.map(roomModel -> ResponseEntity.ok(roomConverter.convertToDTO(roomModel)))
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    public Optional<RoomModel> getRoomById(long id) {
+        return roomRepository.findById(id);
     }
 
 
