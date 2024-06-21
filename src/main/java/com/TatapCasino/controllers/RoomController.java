@@ -1,7 +1,6 @@
 package com.TatapCasino.controllers;
 
 import com.TatapCasino.dto.RoomDTO;
-import com.TatapCasino.model.RoomModel;
 import com.TatapCasino.service.GameService;
 import com.TatapCasino.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +36,15 @@ public class RoomController {
     }
 
     @PostMapping("/join-room")
-    public ResponseEntity<RoomDTO> joinRoom(/*@Validated*/ @RequestBody RoomDTO roomDTO) {
+    public ResponseEntity<RoomDTO> joinRoom(@RequestBody RoomDTO roomDTO) {
         return roomService.joinPlayerToRoom(roomDTO);
+    }
+
+    @PostMapping("/exit-room")
+    //TODO:
+    // MAKE LOGIC WITH EXIT FROM ROOM
+    // ALSO CHECK WATS HAPPEN WITH GAME OBJECT SCORE ETC
+    public ResponseEntity<RoomDTO> exitRoom(@RequestBody RoomDTO roomDTO) {
+        return roomService.exitPlayerFromRoom(roomDTO);
     }
 }

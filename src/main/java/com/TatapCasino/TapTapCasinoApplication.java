@@ -58,7 +58,7 @@ public class TapTapCasinoApplication implements CommandLineRunner {
 		gameService.saveGame(testGameModel);
 
 		roomService.createRoom(createDummyRoomDTO(1L, List.of(1L)));
-		roomService.joinPlayerToRoom(createDummyRoomDTO(1L, List.of(1L,2L)));
+		roomService.joinPlayerToRoom(createDummyRoomDTO(1L, List.of(2L)));
 
 	}
 

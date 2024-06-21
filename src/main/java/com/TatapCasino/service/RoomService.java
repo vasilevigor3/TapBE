@@ -4,8 +4,6 @@ import com.TatapCasino.converter.RoomConverter;
 import com.TatapCasino.dto.RoomDTO;
 import com.TatapCasino.model.PlayerModel;
 import com.TatapCasino.model.RoomModel;
-import com.TatapCasino.repository.GameRepository;
-import com.TatapCasino.repository.PlayerRepository;
 import com.TatapCasino.repository.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -57,16 +55,11 @@ public class RoomService {
         }
 
         if (player.isPresent()) {
-            final RoomModel currentRoom = player.get().getCurrentRoom();
-            final RoomModel ownedRoom = player.get().getOwnedRoom();
+            validatePlayerForRoom(player.get(), roomDTO.getId());
 
-            if (currentRoom == null && ownedRoom == null) {
-                final RoomModel roomModel = roomConverter.convertToModel(roomDTO);
-                saveRoom(roomModel);
-                return roomConverter.convertToDTO(roomModel);
-            } else {
-                throw new RuntimeException("Player with ID " + roomDTO.getOwnerId() + " is already in a room");
-            }
+            final RoomModel roomModel = roomConverter.convertToModel(roomDTO);
+            saveRoom(roomModel);
+            return roomConverter.convertToDTO(roomModel);
         } else {
             throw new RuntimeException("Player with ID " + roomDTO.getOwnerId() + " not found");
         }
@@ -74,11 +67,73 @@ public class RoomService {
 
     @Transactional
     public ResponseEntity<RoomDTO> joinPlayerToRoom(final RoomDTO roomDTO) {
-        final Optional<RoomModel> roomModelOptional = roomRepository.findById(roomDTO.getId());
-        final RoomModel roomModel = roomModelOptional.orElseThrow(() -> new RuntimeException("Room not found"));
-        roomModel.getPlayers().addAll(playerService.getPlayersByIds(roomDTO.getPlayerIds()));
-        saveRoom(roomModel);
-        return roomModelOptional.map(roomModel2 -> ResponseEntity.ok(roomConverter.convertToDTO(roomModel2)))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        final Optional<RoomModel> room = roomRepository.findById(roomDTO.getId());
+        final RoomModel roomModel = room.orElseThrow(() -> new RuntimeException("Room not found"));
+
+        final Long playerId = roomDTO.getPlayerIds().get(0);
+        final Optional<PlayerModel> player = playerService.getPlayerById(playerId);
+
+        if (player.isPresent()) {
+            validatePlayerForRoom(player.get(), roomModel.getId());
+
+            roomModel.getPlayers().add(player.get());
+            player.get().setCurrentRoom(roomModel);
+
+            saveRoom(roomModel);
+            playerService.savePlayer(player.get());
+
+            return ResponseEntity.ok(roomConverter.convertToDTO(roomModel));
+        } else {
+            throw new RuntimeException("Player with ID " + playerId + " not found");
+        }
+    }
+
+    @Transactional
+    public ResponseEntity<RoomDTO> exitPlayerFromRoom(final RoomDTO roomDTO) {
+        final Optional<RoomModel> room = roomRepository.findById(roomDTO.getId());
+        final RoomModel roomModel = room.orElseThrow(() -> new RuntimeException("Room not found"));
+
+        final Long playerId = roomDTO.getPlayerIds().get(0);
+        final Optional<PlayerModel> player = playerService.getPlayerById(playerId);
+
+        if (player.isPresent()) {
+            final PlayerModel playerModel = player.get();
+
+            if (roomModel.getOwner().equals(playerModel)) {
+                // If the player owns the room, remove references and delete the room
+                roomModel.getPlayers().forEach(p -> {
+                    p.setCurrentRoom(null);
+                    playerService.savePlayer(p);
+                });
+                playerModel.setOwnedRoom(null);
+                playerService.savePlayer(playerModel);
+                roomRepository.delete(roomModel);
+            } else if (roomModel.getPlayers().contains(playerModel)) {
+                // If the player is in the room, remove the player from the room
+                roomModel.getPlayers().remove(playerModel);
+                playerModel.setCurrentRoom(null); // Remove the player's current room
+                saveRoom(roomModel);
+                playerService.savePlayer(playerModel); // Save the player to update their room status
+            } else {
+                throw new RuntimeException("Player with ID " + playerId + " is not in the room");
+            }
+
+            return ResponseEntity.ok(roomConverter.convertToDTO(roomModel));
+        } else {
+            throw new RuntimeException("Player with ID " + playerId + " not found");
+        }
+    }
+
+    private void validatePlayerForRoom(final PlayerModel playerModel, final Long roomId) {
+        final RoomModel currentRoom = playerModel.getCurrentRoom();
+        final RoomModel ownedRoom = playerModel.getOwnedRoom();
+
+        if (currentRoom != null) {
+            throw new RuntimeException("Player with ID " + playerModel.getId() + " is already in a room");
+        }
+
+        if (ownedRoom != null && ownedRoom.getId().equals(roomId)) {
+            throw new RuntimeException("Player with ID " + playerModel.getId() + " is the owner of the room");
+        }
     }
 }
