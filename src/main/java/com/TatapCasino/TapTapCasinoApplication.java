@@ -52,11 +52,6 @@ public class TapTapCasinoApplication implements CommandLineRunner {
 		final PlayerModel testPlayer2 = playerService.getOrCreatePlayer(testUser2.getId());
 		final PlayerModel testPlayer3 = playerService.getOrCreatePlayer(testUser3.getId());
 
-
-		final GameModel testGameModel = new GameModel();
-		testGameModel.setGameType(GameType.ROULETTE);
-		gameService.saveGame(testGameModel);
-
 		roomService.createRoom(createDummyRoomDTO(1L, List.of(1L)));
 		roomService.joinPlayerToRoom(createDummyRoomDTO(1L, List.of(2L)));
 

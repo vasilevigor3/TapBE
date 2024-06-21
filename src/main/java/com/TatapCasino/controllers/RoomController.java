@@ -13,6 +13,7 @@ import com.TatapCasino.service.RoomService;
 import com.TatapCasino.service.ScoreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -71,6 +72,7 @@ public class RoomController {
     @PostMapping("/finish-game")
     //TODO dangerous method, anyone could call it
     // TODO VOID
+    @Transactional
     public PlayerDTO finishGame(@RequestBody ScoreRequest scoreRequest) {
         String roomId = scoreRequest.getRoomId();
         final Optional<RoomModel> roomById = roomService.getRoomById(Long.parseLong(roomId));
@@ -98,9 +100,8 @@ public class RoomController {
                         scoreModel.setScore(Integer.parseInt(score));
                         scoreService.saveScore(scoreModel);
                     });
-                    playersCurrentRoomWithScores.put(playerModel,Long.parseLong(score));
+                    playersCurrentRoomWithScores.put(playerModel, Long.parseLong(score));
                     playerService.savePlayer(playerModel);
-
                 }
             }
         }
@@ -111,13 +112,22 @@ public class RoomController {
 
         if (maxEntry.isPresent()) {
             PlayerModel playerWithMaxScore = maxEntry.get().getKey();
-            Long maxScore = maxEntry.get().getValue();
+
             final Optional<GameModel> gameById = gameService.findGameById(gameModelId);
-            gameById.ifPresent(gameModel -> playerWithMaxScore.getWonGames().add(gameModel));
+
+            final GameModel gameModel = gameById.get();
+            playerWithMaxScore.getWonGames().add(gameModel);
+
+            playerService.savePlayer(playerWithMaxScore);
+
+            gameModel.setWinner(playerWithMaxScore);
+            gameService.saveGame(gameModel);
+
+            roomModel.setIsGameFinished(true);
+
+            roomService.saveRoom(roomModel);
 
             return playerConverter.convertToDTO(playerWithMaxScore);
-
-//            System.out.println("Player with max score: " + playerWithMaxScore.getId() + ", Score: " + maxScore);
         }
         return null;
     }

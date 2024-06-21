@@ -32,7 +32,7 @@ public class RoomModel {
     @JoinColumn(name = "owner_id")
     private PlayerModel owner;
 
-    @OneToMany(mappedBy = "currentRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "currentRoom", cascade = CascadeType.ALL)
     private List<PlayerModel> players;
 
     private Boolean isGameStarted;

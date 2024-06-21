@@ -53,6 +53,10 @@ public class RoomService {
         return savedRoom;
     }
 
+    public void deleteRoom(RoomModel roomModel){
+        roomRepository.delete(roomModel);
+    }
+
     public PlayerModel addScoreModelToPlayer(final PlayerModel playerModel, final GameModel gameModel) {
         final ScoreModel scoreModel = new ScoreModel();
         scoreModel.setGameId(gameModel.getId());

@@ -38,6 +38,6 @@ public class PlayerModel {
     @OneToMany(mappedBy = "player", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<ScoreModel> scores;
 
-    @OneToMany(mappedBy = "winner")
+    @OneToMany(mappedBy = "winner", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<GameModel> wonGames;
 }

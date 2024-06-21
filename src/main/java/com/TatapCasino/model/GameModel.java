@@ -22,6 +22,6 @@ public class GameModel {
     @JoinColumn(name = "winner_id")
     private PlayerModel winner;
 
-    @OneToOne(mappedBy = "gameModel", cascade = CascadeType.ALL/*, orphanRemoval = true*/)
+    @OneToOne(mappedBy = "gameModel", cascade = CascadeType.ALL)
     private RoomModel room;
 }
