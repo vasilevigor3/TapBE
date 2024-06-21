@@ -24,7 +24,8 @@ public class RoomModel {
     private double bet;
 
     @NotNull
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "game_model_id")
     private GameModel gameModel;
 
     @NotNull
@@ -32,7 +33,6 @@ public class RoomModel {
     @JoinColumn(name = "owner_id")
     private PlayerModel owner;
 
-    @NotNull
-    @OneToMany(mappedBy = "currentRoom")
+    @OneToMany(mappedBy = "currentRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PlayerModel> players;
 }

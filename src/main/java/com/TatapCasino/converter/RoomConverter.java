@@ -33,6 +33,7 @@ public class RoomConverter {
 
         GameModel gameModel = new GameModel();
         gameModel.setGameType(GameType.valueOf(roomDTO.getGameType()));
+        gameModel.setRoom(roomModel);
         gameService.saveGame(gameModel);
 
         roomModel.setGameModel(gameModel);

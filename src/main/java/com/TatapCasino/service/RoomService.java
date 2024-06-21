@@ -2,6 +2,7 @@ package com.TatapCasino.service;
 
 import com.TatapCasino.converter.RoomConverter;
 import com.TatapCasino.dto.RoomDTO;
+import com.TatapCasino.model.GameModel;
 import com.TatapCasino.model.PlayerModel;
 import com.TatapCasino.model.RoomModel;
 import com.TatapCasino.repository.RoomRepository;

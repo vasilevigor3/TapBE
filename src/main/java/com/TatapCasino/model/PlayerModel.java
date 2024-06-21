@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.List;
+
 
 @Entity
 @Getter
@@ -32,4 +34,10 @@ public class PlayerModel {
     @ManyToOne
     @JoinColumn(name = "current_room_id")
     private RoomModel currentRoom;
+
+    @OneToMany(mappedBy = "player", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ScoreModel> scores;
+
+    @OneToMany(mappedBy = "winner")
+    private List<GameModel> wonGames;
 }

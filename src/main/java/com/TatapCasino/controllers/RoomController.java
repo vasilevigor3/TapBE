@@ -42,7 +42,6 @@ public class RoomController {
 
     @PostMapping("/exit-room")
     //TODO:
-    // MAKE LOGIC WITH EXIT FROM ROOM
     // ALSO CHECK WATS HAPPEN WITH GAME OBJECT SCORE ETC
     public ResponseEntity<RoomDTO> exitRoom(@RequestBody RoomDTO roomDTO) {
         return roomService.exitPlayerFromRoom(roomDTO);
