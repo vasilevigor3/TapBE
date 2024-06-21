@@ -25,7 +25,7 @@ public class TGUserService {
     @Value("${telegram.user.check.enabled}")
     private boolean isTelegramUserCheckEnabled;
 
-    private static final String TELEGRAM_API_URL = "https://api.telegram.org/bot7237751589:AAFxs_T73zvEkmiPgA7xbAczOwCMJNQfyOM/getChat?chat_id=";
+    private static final String TELEGRAM_API_URL = "https://api.telegram.org/{token}/getChat?chat_id=";
 
     public List<TGUserDTO> getAllTGUsers() {
         final List<TGUserModel> tgUsersAll = TGUserRepository.findAll();
