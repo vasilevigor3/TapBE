@@ -1,6 +1,5 @@
 package com.TatapCasino.model;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -35,4 +34,7 @@ public class RoomModel {
 
     @OneToMany(mappedBy = "currentRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PlayerModel> players;
+
+    private Boolean isGameStarted;
+    private Boolean isGameFinished;
 }

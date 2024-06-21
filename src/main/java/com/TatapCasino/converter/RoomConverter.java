@@ -56,12 +56,19 @@ public class RoomConverter {
         roomDTO.setMaxPlayers(roomModel.getMaxPlayers());
         roomDTO.setBet(roomModel.getBet());
         roomDTO.setGameType(roomModel.getGameModel().getGameType().toString());
+        if (roomModel.getGameModel().getWinner() != null) {
+            roomDTO.setWinnerId(roomModel.getGameModel().getWinner().getId());
+        } else {
+            roomDTO.setWinnerId(null);
+        }
         roomDTO.setOwnerId(roomModel.getOwner().getId());
         final List<Long> playersIds = roomModel
                 .getPlayers()
                 .stream()
                 .map(PlayerModel::getId).toList();
         roomDTO.setPlayerIds(playersIds);
+        roomDTO.setIsGameStarted(roomModel.getIsGameStarted());
+        roomDTO.setIsGameFinished(roomModel.getIsGameFinished());
         return roomDTO;
     }
 }

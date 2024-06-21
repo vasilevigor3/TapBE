@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.lang.Nullable;
 
+import java.util.List;
+
 
 @Setter
 @Getter
@@ -22,4 +24,5 @@ public class PlayerDTO {
 
     private Long ownedRoomId;
     private Long currentRoomId;
+    private List<Long> wonGamesIds;
 }

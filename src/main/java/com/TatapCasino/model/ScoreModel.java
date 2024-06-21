@@ -21,4 +21,8 @@ public class ScoreModel {
     @ManyToOne
     @JoinColumn(name = "player_id")
     private PlayerModel player;
+
+    @NotNull
+    private Long gameId;
+
 }

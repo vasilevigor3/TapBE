@@ -5,7 +5,6 @@ import com.TatapCasino.converter.TGUserToPlayerConverter;
 import com.TatapCasino.dto.PlayerDTO;
 import com.TatapCasino.exceptions.TGUserNotFoundException;
 import com.TatapCasino.model.PlayerModel;
-import com.TatapCasino.model.ScoreModel;
 import com.TatapCasino.model.TGUserModel;
 import com.TatapCasino.repository.PlayerRepository;
 import org.springframework.beans.factory.annotation.Autowired;

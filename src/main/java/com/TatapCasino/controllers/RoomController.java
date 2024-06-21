@@ -1,5 +1,6 @@
 package com.TatapCasino.controllers;
 
+import com.TatapCasino.dto.ResultDTO;
 import com.TatapCasino.dto.RoomDTO;
 import com.TatapCasino.service.GameService;
 import com.TatapCasino.service.RoomService;
@@ -41,9 +42,21 @@ public class RoomController {
     }
 
     @PostMapping("/exit-room")
-    //TODO:
-    // ALSO CHECK WATS HAPPEN WITH GAME OBJECT SCORE ETC
     public ResponseEntity<RoomDTO> exitRoom(@RequestBody RoomDTO roomDTO) {
         return roomService.exitPlayerFromRoom(roomDTO);
+    }
+
+//    @PostMapping("/start-game")
+//    //TODO dangerous method, anyone could call it
+//    // -add to RoomModel/RoomDto gameStarted
+//    // don't call it, only for testing, game starts after 10/10 (joinRoom)
+//    public ResponseEntity<RoomDTO> startGame(@RequestBody RoomDTO roomDTO) {
+//        return roomService.startGame(roomDTO);
+//    }
+
+    @PostMapping("/finish-game")
+    //TODO dangerous method, anyone could call it
+    public ResponseEntity<ResultDTO> finishGame(@RequestBody RoomDTO roomDTO) {
+        return roomService.finishGame(roomDTO);
     }
 }

@@ -35,7 +35,7 @@ public class PlayerModel {
     @JoinColumn(name = "current_room_id")
     private RoomModel currentRoom;
 
-    @OneToMany(mappedBy = "player", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "player", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<ScoreModel> scores;
 
     @OneToMany(mappedBy = "winner")

@@ -18,11 +18,10 @@ public class GameModel {
     @Enumerated(EnumType.STRING)
     private GameType gameType;
 
-    @NotNull
     @ManyToOne
     @JoinColumn(name = "winner_id")
     private PlayerModel winner;
 
-    @OneToOne(mappedBy = "gameModel", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "gameModel", cascade = CascadeType.ALL/*, orphanRemoval = true*/)
     private RoomModel room;
 }

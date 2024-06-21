@@ -1,6 +1,7 @@
 package com.TatapCasino.converter;
 
 import com.TatapCasino.dto.PlayerDTO;
+import com.TatapCasino.model.GameModel;
 import com.TatapCasino.model.PlayerModel;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,13 @@ public class PlayerConverter {
         if (playerModel.getCurrentRoom() != null) {
             playerDTO.setCurrentRoomId(playerModel.getCurrentRoom().getId());
         }
+
+        if (playerModel.getWonGames() != null) {
+            playerDTO.setWonGamesIds(playerModel.getWonGames().stream().map(GameModel::getId).toList());
+        } else {
+            playerDTO.setWonGamesIds(null);
+        }
+
 
         return playerDTO;
     }

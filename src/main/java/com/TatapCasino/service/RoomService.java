@@ -1,10 +1,12 @@
 package com.TatapCasino.service;
 
 import com.TatapCasino.converter.RoomConverter;
+import com.TatapCasino.dto.ResultDTO;
 import com.TatapCasino.dto.RoomDTO;
 import com.TatapCasino.model.GameModel;
 import com.TatapCasino.model.PlayerModel;
 import com.TatapCasino.model.RoomModel;
+import com.TatapCasino.model.ScoreModel;
 import com.TatapCasino.repository.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -47,7 +49,20 @@ public class RoomService {
         return savedRoom;
     }
 
+    public PlayerModel addScoreModelToPlayer(final PlayerModel playerModel, final GameModel gameModel) {
+        final ScoreModel scoreModel = new ScoreModel();
+        scoreModel.setGameId(gameModel.getId());
+        playerModel.getScores().add(scoreModel);
+
+        return playerService.savePlayer(playerModel);
+    }
+
     public RoomDTO createRoom(final RoomDTO roomDTO) {
+
+        //TODO
+        // - add to RoomDTO winnerID +++
+        // - create ScoreModel obj to owner +++
+        // - add wonGames to PlayerDTO +++
         final Optional<RoomModel> existingRoom = roomRepository.findById(roomDTO.getId());
         final Optional<PlayerModel> player = playerService.getPlayerById(roomDTO.getOwnerId());
 
@@ -56,9 +71,13 @@ public class RoomService {
         }
 
         if (player.isPresent()) {
-            validatePlayerForRoom(player.get(), roomDTO.getId());
+            final PlayerModel playerModel = player.get();
+            validatePlayerForRoom(playerModel, roomDTO.getId());
 
             final RoomModel roomModel = roomConverter.convertToModel(roomDTO);
+            addScoreModelToPlayer(playerModel, roomModel.getGameModel());
+            roomModel.setIsGameStarted(false);
+            roomModel.setIsGameFinished(false);
             saveRoom(roomModel);
             return roomConverter.convertToDTO(roomModel);
         } else {
@@ -68,6 +87,8 @@ public class RoomService {
 
     @Transactional
     public ResponseEntity<RoomDTO> joinPlayerToRoom(final RoomDTO roomDTO) {
+        //TODO
+        // - create ScoreModel obj to player who was joined +++
         final Optional<RoomModel> room = roomRepository.findById(roomDTO.getId());
         final RoomModel roomModel = room.orElseThrow(() -> new RuntimeException("Room not found"));
 
@@ -75,13 +96,21 @@ public class RoomService {
         final Optional<PlayerModel> player = playerService.getPlayerById(playerId);
 
         if (player.isPresent()) {
-            validatePlayerForRoom(player.get(), roomModel.getId());
+            final PlayerModel playerModel = player.get();
 
-            roomModel.getPlayers().add(player.get());
-            player.get().setCurrentRoom(roomModel);
+            validatePlayerForRoom(playerModel, roomModel.getId());
+
+            roomModel.getPlayers().add(playerModel);
+            playerModel.setCurrentRoom(roomModel);
+
+            addScoreModelToPlayer(playerModel, roomModel.getGameModel());
+
+            if (roomModel.getMaxPlayers() == roomModel.getPlayers().size()) {
+                roomModel.setIsGameStarted(true);
+            }
 
             saveRoom(roomModel);
-            playerService.savePlayer(player.get());
+            playerService.savePlayer(playerModel);
 
             return ResponseEntity.ok(roomConverter.convertToDTO(roomModel));
         } else {
@@ -136,5 +165,18 @@ public class RoomService {
         if (ownedRoom != null && ownedRoom.getId().equals(roomId)) {
             throw new RuntimeException("Player with ID " + playerModel.getId() + " is the owner of the room");
         }
+    }
+
+//    //TODO run startGame when joined last player 10/10
+//    public ResponseEntity<RoomDTO> startGame(RoomDTO roomDTO) {
+//        final Optional<RoomModel> room = roomRepository.findById(roomDTO.getId());
+//        final RoomModel roomModel = room.orElseThrow(() -> new RuntimeException("Room not found"));
+//        //TODO if room.maxPlayers==playerIds.size() -> roomModel.setIsGameStarted(true);
+//        return ResponseEntity.ok(roomConverter.convertToDTO(roomModel));
+//    }
+
+    public ResponseEntity<ResultDTO> finishGame(RoomDTO roomDTO) {
+        final ResultDTO resultDTO = new ResultDTO();
+        return ResponseEntity.ok(resultDTO);
     }
 }

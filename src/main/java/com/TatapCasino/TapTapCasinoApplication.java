@@ -66,7 +66,7 @@ public class TapTapCasinoApplication implements CommandLineRunner {
 		final RoomDTO roomDTO = new RoomDTO();
 		roomDTO.setId(id);
 		roomDTO.setRoomName("Dummy Room Name");
-		roomDTO.setMaxPlayers(10);
+		roomDTO.setMaxPlayers(3);
 		roomDTO.setOwnerId(1L);
 		roomDTO.setGameType("ROULETTE");
 		roomDTO.setPlayerIds(ids);
