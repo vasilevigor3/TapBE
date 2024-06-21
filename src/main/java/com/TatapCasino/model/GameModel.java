@@ -2,7 +2,6 @@ package com.TatapCasino.model;
 
 import com.TatapCasino.enums.GameType;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -127,6 +127,16 @@ public class RoomController {
 
             roomService.saveRoom(roomModel);
 
+            gameModel.setRoom(null);
+            gameService.saveGame(gameModel);
+
+            roomModel.getPlayers().forEach(player -> {
+                player.setCurrentRoom(null);
+                playerService.savePlayer(player);
+            });
+
+            roomService.deleteRoom(roomModel);
+
             return playerConverter.convertToDTO(playerWithMaxScore);
         }
         return null;

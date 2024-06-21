@@ -23,7 +23,7 @@ public class RoomModel {
     private double bet;
 
     @NotNull
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "game_model_id")
     private GameModel gameModel;
 
