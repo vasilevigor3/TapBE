@@ -239,6 +239,7 @@ public class RoomService {
     private void processWinner(RoomModel roomModel, Long gameModelId, PlayerModel playerWithMaxScore) {
         final GameModel gameModel = gameService.findGameById(gameModelId)
                 .orElseThrow(() -> new RuntimeException("Game with id: " + gameModelId + " doesn't exist"));
+        updateBalanceToWinner(playerWithMaxScore, roomModel);
         playerWithMaxScore.getWonGames().add(gameModel);
         gameModel.setWinner(playerWithMaxScore);
         gameModel.setRoom(null);
@@ -249,5 +250,12 @@ public class RoomService {
             playerService.savePlayer(player);
         });
         deleteRoom(roomModel);
+    }
+
+    private void updateBalanceToWinner(final PlayerModel playerWithMaxScore, RoomModel roomModel){
+        final double bet = roomModel.getBet();
+        final double awward = roomModel.getMaxPlayers() * bet;
+
+        playerWithMaxScore.setBalance(playerWithMaxScore.getBalance() + awward);
     }
 }

@@ -18,9 +18,6 @@ public class RoomDTO {
     private String roomName;
     @NotNull
     private int maxPlayers;
-
-    // TODO add summary win balance to GameModel
-    // TODO -add to winner balance
     private double bet;
     @NotNull
     private Long ownerId;
