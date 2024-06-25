@@ -36,7 +36,7 @@ public class RoomController {
 
 
     @PostMapping("/create-room")
-    public RoomDTO createRoom(@Validated @RequestBody RoomDTO roomDTO) {
+    public RoomDTO createRoom(/*@Validated*/ @RequestBody RoomDTO roomDTO) {
         return roomService.createRoom(roomDTO);
     }
 
@@ -45,7 +45,10 @@ public class RoomController {
         return roomService.joinPlayerToRoom(roomDTO);
     }
 
-    @PostMapping("/exit-room")
+    //TODO when leave room and 3/3 "isGameStarted": true, after leave it is still "isGameStarted": true
+    // question is: what behavior should be? could player leave room after start?
+    //
+    @PostMapping("/leave-room")
     public ResponseEntity<RoomDTO> exitRoom(@RequestBody RoomDTO roomDTO) {
         return roomService.exitPlayerFromRoom(roomDTO);
     }

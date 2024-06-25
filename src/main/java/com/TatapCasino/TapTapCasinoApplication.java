@@ -32,9 +32,9 @@ public class TapTapCasinoApplication implements CommandLineRunner {
 	private GameService gameService;
 
 	@Autowired
-	RoomRepository roomRepository;
+	private RoomRepository roomRepository;
 	@Autowired
-	PlayerRepository playerRepository;
+	private PlayerRepository playerRepository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(TapTapCasinoApplication.class, args);
@@ -53,14 +53,17 @@ public class TapTapCasinoApplication implements CommandLineRunner {
 		roomService.createRoom(createDummyRoomDTO(1L, List.of(1L)));
 		roomService.joinPlayerToRoom(createDummyRoomDTO(1L, List.of(2L)));
 
+		roomService.createRoom(createDummyRoomDTO(2L, List.of(3L)));
+//		roomService.joinPlayerToRoom(createDummyRoomDTO(1L, List.of(2L)));
+
 	}
 
 	public RoomDTO createDummyRoomDTO(final Long id, final List<Long> ids){
 		final RoomDTO roomDTO = new RoomDTO();
-		roomDTO.setId(id);
+		roomDTO.setRoomId(id);
 		roomDTO.setRoomName("Dummy Room Name");
 		roomDTO.setMaxPlayers(3);
-		roomDTO.setOwnerId(1L);
+		roomDTO.setOwnerId(ids.get(0));
 		roomDTO.setGameType("ROULETTE");
 		roomDTO.setPlayerIds(ids);
 		roomDTO.setBet(0.1);

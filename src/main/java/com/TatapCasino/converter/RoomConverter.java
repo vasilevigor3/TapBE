@@ -31,7 +31,7 @@ public class RoomConverter {
         roomModel.setOwner(owner);
 
         GameModel gameModel = new GameModel();
-        gameModel.setGameType(GameType.valueOf(roomDTO.getGameType()));
+        gameModel.setGameType(GameType.valueOf(roomDTO.getGameType().toUpperCase()));
         gameModel.setRoom(roomModel);
         gameService.saveGame(gameModel);
 
@@ -50,7 +50,7 @@ public class RoomConverter {
 
     public RoomDTO convertToDTO(RoomModel roomModel) {
         RoomDTO roomDTO = new RoomDTO();
-        roomDTO.setId(roomModel.getId());
+        roomDTO.setRoomId(roomModel.getId());
         roomDTO.setRoomName(roomModel.getRoomName());
         roomDTO.setMaxPlayers(roomModel.getMaxPlayers());
         roomDTO.setBet(roomModel.getBet());

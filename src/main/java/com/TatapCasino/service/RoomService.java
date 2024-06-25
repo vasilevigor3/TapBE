@@ -78,16 +78,17 @@ public class RoomService {
 
     public RoomDTO createRoom(final RoomDTO roomDTO) {
 
-        final Optional<RoomModel> existingRoom = roomRepository.findById(roomDTO.getId());
+//        if (roomDTO.getId() != null) {
+//            final Optional<RoomModel> existingRoom = roomRepository.findById(roomDTO.getId());
+//            if (existingRoom.isPresent()) {
+//                throw new RuntimeException("Room with ID " + roomDTO.getId() + " already exists");
+//            }
+//        }
         final Optional<PlayerModel> player = playerService.getPlayerById(roomDTO.getOwnerId());
-
-        if (existingRoom.isPresent()) {
-            throw new RuntimeException("Room with ID " + roomDTO.getId() + " already exists");
-        }
 
         if (player.isPresent()) {
             final PlayerModel playerModel = player.get();
-            validatePlayerForRoom(playerModel, roomDTO.getId());
+            validatePlayerForRoom(playerModel, roomDTO.getRoomId());
 
             final RoomModel roomModel = roomConverter.convertToModel(roomDTO);
             addScoreModelToPlayer(playerModel, roomModel.getGameModel());
@@ -103,7 +104,7 @@ public class RoomService {
     @Transactional
     public ResponseEntity<RoomDTO> joinPlayerToRoom(final RoomDTO roomDTO) {
 
-        final Optional<RoomModel> room = roomRepository.findById(roomDTO.getId());
+        final Optional<RoomModel> room = roomRepository.findById(roomDTO.getRoomId());
         final RoomModel roomModel = room.orElseThrow(() -> new RuntimeException("Room not found"));
 
         final Long playerId = roomDTO.getPlayerIds().get(0);
@@ -134,7 +135,7 @@ public class RoomService {
 
     @Transactional
     public ResponseEntity<RoomDTO> exitPlayerFromRoom(final RoomDTO roomDTO) {
-        final Optional<RoomModel> room = roomRepository.findById(roomDTO.getId());
+        final Optional<RoomModel> room = roomRepository.findById(roomDTO.getRoomId());
         final RoomModel roomModel = room.orElseThrow(() -> new RuntimeException("Room not found"));
 
         final Long playerId = roomDTO.getPlayerIds().get(0);
@@ -252,7 +253,7 @@ public class RoomService {
         deleteRoom(roomModel);
     }
 
-    private void updateBalanceToWinner(final PlayerModel playerWithMaxScore, RoomModel roomModel){
+    private void updateBalanceToWinner(final PlayerModel playerWithMaxScore, RoomModel roomModel) {
         final double bet = roomModel.getBet();
         final double awward = roomModel.getMaxPlayers() * bet;
 

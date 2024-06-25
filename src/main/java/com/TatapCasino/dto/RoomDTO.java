@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 public class RoomDTO {
 
-    private Long id;
+    private Long roomId;
     @NotNull
     @NotBlank
     private String roomName;
