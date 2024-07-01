@@ -48,6 +48,12 @@ public class PlayerService {
         return playerRepository.findAllById(playersIds);
     }
 
+    public List<PlayerDTO> getPlayersDtoByIds(List<Long> playersIds){
+        final List<PlayerModel> playersByIds = getPlayersByIds(playersIds);
+        return playersByIds.stream()
+                .map(playerModel -> playerConverter.convertToDTO(playerModel))
+                .toList();
+    }
     public Optional<PlayerModel> getPlayerById(final long id){
         return playerRepository.findById(id);
     }

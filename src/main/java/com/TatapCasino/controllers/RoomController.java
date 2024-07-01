@@ -53,11 +53,14 @@ public class RoomController {
         return roomService.exitPlayerFromRoom(roomDTO);
     }
 
-    @PostMapping("/finish-game")
     //TODO dangerous method, anyone could call it
     // try catch as player controller
+    //TODO:
+    // check if Players from room == Players from scoreRequest
+    @PostMapping("/finish-game")
     @Transactional
     public ResponseEntity<PlayerDTO> finishGame(@RequestBody ScoreRequest scoreRequest) {
+        System.out.println(scoreRequest);
         try {
             final PlayerDTO winner = roomService.finishGame(scoreRequest);
             return ResponseEntity.ok(winner);

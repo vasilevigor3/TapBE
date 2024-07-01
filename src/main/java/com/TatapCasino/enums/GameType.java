@@ -1,5 +1,5 @@
 package com.TatapCasino.enums;
 
 public enum GameType {
-    KNB, ROULETTE
+    KNB, ROULETTE, FF
 }
